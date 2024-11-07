@@ -1,0 +1,6 @@
+myenv
+venv*
+*.log
+.idea
+token1.py
+__pycache__
