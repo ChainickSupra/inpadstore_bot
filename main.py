@@ -461,18 +461,6 @@ async def handle_renga_version(update: Update, context: ContextTypes.DEFAULT_TYP
     await update.message.reply_text("Напишите номер сборки плагинов, которую вы использовали.")
     context.user_data['stage'] = 'build_number_renga'
 
-#async def handle_build_number_renga(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-#    if 'stage' not in context.user_data or context.user_data['stage'] != 'build_number_renga':
-#        return
-#
-#    context.user_data['stage'] = 'screenshot_and_description'
-#    keyboard = [
-#        [InlineKeyboardButton("Хочу сообщить об ошибке", callback_data='renga_error_report')],
-#        [InlineKeyboardButton("Хочу задать вопрос касаемо работы плагина", callback_data='renga_question')]
-#    ]
-#    reply_markup = InlineKeyboardMarkup(keyboard)
-#    await update.message.reply_text("Выберите один из вариантов:", reply_markup=reply_markup)
-
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if 'stage' in context.user_data:
         if context.user_data['stage'] == 'license_key':
