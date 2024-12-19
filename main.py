@@ -54,7 +54,7 @@ async def error_report(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         [InlineKeyboardButton("Архитектура", callback_data='menu_architect_error')],
         [InlineKeyboardButton("Конструктив", callback_data='menu_constructive_error')],
         [InlineKeyboardButton("ОВ и ВК", callback_data='menu_ov_vk_error')],
-        [InlineKeyboardButton("Общее", callback_data='menu_general_error')],
+        [InlineKeyboardButton("Общие", callback_data='menu_general_error')],
         [InlineKeyboardButton("Боксы и отверстия", callback_data='menu_boxes_error')],
         [InlineKeyboardButton("Renga", callback_data='menu_renga_error')],
         [InlineKeyboardButton("Назад", callback_data='menu_help')]
@@ -80,6 +80,7 @@ async def menu_concept_plugin(update: Update, context: ContextTypes.DEFAULT_TYPE
     keyboard = [
         [InlineKeyboardButton("Инсоляция", callback_data='concept_insolation')],
         [InlineKeyboardButton("КЕО", callback_data='concept_keo')],
+        [InlineKeyboardButton("Генерация парков", callback_data='concept_parks')],
         [InlineKeyboardButton("Генерация деревьев", callback_data='concept_trees')],
         [InlineKeyboardButton("Разлиновка модели", callback_data='concept_model')],
         [InlineKeyboardButton("3D сетки", callback_data='concept_3d')],
@@ -96,6 +97,7 @@ async def menu_concept_error(update: Update, context: ContextTypes.DEFAULT_TYPE)
     keyboard = [
         [InlineKeyboardButton("Инсоляция", callback_data='concept_insolation')],
         [InlineKeyboardButton("КЕО", callback_data='concept_keo')],
+        [InlineKeyboardButton("Генерация парков", callback_data='concept_parks')],
         [InlineKeyboardButton("Генерация деревьев", callback_data='concept_trees')],
         [InlineKeyboardButton("Разлиновка модели", callback_data='concept_model')],
         [InlineKeyboardButton("3D сетки", callback_data='concept_3d')],
@@ -112,14 +114,14 @@ async def menu_architect_plugin(update: Update, context: ContextTypes.DEFAULT_TY
     keyboard = [
         [InlineKeyboardButton("Определить помещение", callback_data='architect_room')],
         [InlineKeyboardButton("Расчет плинтуса", callback_data='architect_baseboard')],
-        [InlineKeyboardButton("Отделка", callback_data='carchitect_finishing')],
+        [InlineKeyboardButton("Отделка", callback_data='architect_finishing')],
         [InlineKeyboardButton("Копировать отделку", callback_data='architect_copy')],
         [InlineKeyboardButton("Проемы по дверям/окнам из связи", callback_data='architect_openings')],
         [InlineKeyboardButton("Соединение полов", callback_data='architect_floors')],
         [InlineKeyboardButton("Подсчет площадей", callback_data='architect_areas')],
         [InlineKeyboardButton("Планировка", callback_data='architect_planning')],
         [InlineKeyboardButton("Округление площади", callback_data='architect_round')],
-        [InlineKeyboardButton("Нумерация кваритр", callback_data='architect_apartment')],
+        [InlineKeyboardButton("Нумерация квартир", callback_data='architect_apartment')],
         [InlineKeyboardButton("Назад", callback_data='plugin_help')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -131,14 +133,14 @@ async def menu_architect_error(update: Update, context: ContextTypes.DEFAULT_TYP
     keyboard = [
         [InlineKeyboardButton("Определить помещение", callback_data='architect_room')],
         [InlineKeyboardButton("Расчет плинтуса", callback_data='architect_baseboard')],
-        [InlineKeyboardButton("Отделка", callback_data='carchitect_finishing')],
+        [InlineKeyboardButton("Отделка", callback_data='architect_finishing')],
         [InlineKeyboardButton("Копировать отделку", callback_data='architect_copy')],
         [InlineKeyboardButton("Проемы по дверям/окнам из связи", callback_data='architect_openings')],
         [InlineKeyboardButton("Соединение полов", callback_data='architect_floors')],
         [InlineKeyboardButton("Подсчет площадей", callback_data='architect_areas')],
         [InlineKeyboardButton("Планировка", callback_data='architect_planning')],
         [InlineKeyboardButton("Округление площади", callback_data='architect_round')],
-        [InlineKeyboardButton("Нумерация кваритр", callback_data='architect_apartment')],
+        [InlineKeyboardButton("Нумерация квартир", callback_data='architect_apartment')],
         [InlineKeyboardButton("Назад", callback_data='error_report')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -300,57 +302,176 @@ async def menu_boxes_error(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await query.answer()
     await query.edit_message_text("Выберите каким плагином вы воспользовались:", reply_markup=reply_markup)
 
-async def choose_revit_version(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def menu_renga_plugin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    keyboard = [   
+        [InlineKeyboardButton("Подсчет площадей", callback_data='renga_area')],
+        [InlineKeyboardButton("Активация", callback_data='renga_activation')],
+        [InlineKeyboardButton("Назад", callback_data='plugin_help')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("С каким плагином у вас возникла проблема:", reply_markup=reply_markup)
+
+async def menu_renga_error(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("Revit 2019", callback_data='revit_2019')],
-        [InlineKeyboardButton("Revit 2020", callback_data='revit_2020')],
-        [InlineKeyboardButton("Revit 2021", callback_data='revit_2021')],
-        [InlineKeyboardButton("Revit 2022", callback_data='revit_2022')],
-        [InlineKeyboardButton("Revit 2023", callback_data='revit_2023')],
-        [InlineKeyboardButton("Revit 2024", callback_data='revit_2024')],
-        [InlineKeyboardButton("Revit 2025", callback_data='revit_2025')],
-        [InlineKeyboardButton("Назад", callback_data='activation_help')]
+        [InlineKeyboardButton("Подсчет площадей", callback_data='renga_area')],
+        [InlineKeyboardButton("Активация", callback_data='renga_activation')],
+        [InlineKeyboardButton("Назад", callback_data='error_report')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("С каким плагином у вас возникла проблема:", reply_markup=reply_markup)
+
+async def choose_revit_version_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    keyboard = [
+        [InlineKeyboardButton("Revit 2019", callback_data='revit_2019_help')],
+        [InlineKeyboardButton("Revit 2020", callback_data='revit_2020_help')],
+        [InlineKeyboardButton("Revit 2021", callback_data='revit_2021_help')],
+        [InlineKeyboardButton("Revit 2022", callback_data='revit_2022_help')],
+        [InlineKeyboardButton("Revit 2023", callback_data='revit_2023_help')],
+        [InlineKeyboardButton("Revit 2024", callback_data='revit_2024_help')],
+        [InlineKeyboardButton("Revit 2025", callback_data='revit_2025_help')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query = update.callback_query
     await query.answer()
     await query.edit_message_text("Выберите версию Revit, в котором запускали плагин:", reply_markup=reply_markup)
 
-
 async def ask_license_key_and_build_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     await update.callback_query.answer()
     await update.callback_query.edit_message_text("Введите, пожалуйста, ваш лицензионный ключ, который вы использовали.")
-
     context.user_data['stage'] = 'license_key'
-
 
 async def handle_license_key(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if 'stage' not in context.user_data or context.user_data['stage'] != 'license_key':
         return
-    
+
     context.user_data['license_key'] = update.message.text
-    
-    await update.message.reply_text("Теперь напишите, пожалуйста, номер сборки, которую вы установили.")
+    await update.message.reply_text("Напишите, пожалуйста, номер сборки, которую вы установили.")
     context.user_data['stage'] = 'build_number'
 
 async def handle_build_number(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if 'stage' not in context.user_data or context.user_data['stage'] != 'build_number':
         return
-    
+
     context.user_data['build_number'] = update.message.text
-    
-    await update.message.reply_text("Отправьте, пожалуйста, скриншот ошибки и опишите вашу проблему.")
-    context.user_data['stage'] = 'screenshot_and_description'
+    if context.user_data.get('initial_choice') == 'error_report':
+        await update.message.reply_text("Отправьте, пожалуйста, скриншот ошибки")
+        context.user_data['stage'] = 'screenshot_and_description'
+    elif context.user_data.get('initial_choice') == 'activation_help':
+        await update.message.reply_text("Отправьте, пожалуйста, скриншот ошибки и опишите вашу проблему")
+        context.user_data['stage'] = 'screenshot_and_description_activation'
+    else:
+        await update.message.reply_text("Опишите ваш вопрос.")
+        context.user_data['stage'] = 'question_description'
 
 async def handle_screenshot_and_description(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    if 'stage' not in context.user_data or context.user_data['stage'] != 'screenshot_and_description':
+    if 'stage' not in context.user_data:
         return
-    
+
+    if context.user_data['stage'] in ['screenshot_and_description', 'build_number_renga']:
+        if update.message.photo:
+            keyboard = [
+                [InlineKeyboardButton("Не отправлять файл", callback_data='no_file')],
+                [InlineKeyboardButton("Отправить файл", callback_data='send_file')]
+            ]
+            reply_markup = InlineKeyboardMarkup(keyboard)
+            await update.message.reply_text("Отправьте, пожалуйста, файл на котором вышла данная ошибка, чтобы мы смогли изучить данную проблему.", reply_markup=reply_markup)
+        else:
+            await update.message.reply_text("Пожалуйста, отправьте скриншот ошибки.")
+    elif context.user_data['stage'] == 'screenshot_and_description_activation':
+        if update.message.photo:
+            await update.message.reply_text("Данная ошибка была передана отделу разработок, в ближайшее время с вами свяжется специалист.")
+            context.user_data.clear()
+        else:
+            await update.message.reply_text("Пожалуйста, отправьте скриншот ошибки и опишите вашу проблему.")
+
+async def handle_screenshot_and_description_activation(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'screenshot_and_description_activation':
+        return
+
     if update.message.photo:
         await update.message.reply_text("Данная ошибка была передана отделу разработок, в ближайшее время с вами свяжется специалист.")
         context.user_data.clear()
     else:
-        await update.message.reply_text("Пожалуйста, отправьте скриншот ошибки.")
+        await update.message.reply_text("Пожалуйста, отправьте скриншот ошибки и опишите вашу проблему.")
+
+async def handle_question_description(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'question_description':
+        return
+
+    keyboard = [
+        [InlineKeyboardButton("Не отправлять файл", callback_data='no_file')],
+        [InlineKeyboardButton("Отправить файл", callback_data='send_file')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("Отправьте, пожалуйста, файл на котором у вас возник вопрос.", reply_markup=reply_markup)
+
+async def handle_file_decision(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+
+    if query.data == 'no_file':
+        await query.edit_message_text("Данный вопрос был передан отделу разработок, в ближайшее время с вами свяжется специалист.")
+        context.user_data.clear()
+    elif query.data == 'send_file':
+        await query.edit_message_text("Прикрепите файл сюда.")
+        context.user_data['stage'] = 'awaiting_file'
+
+async def handle_file(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'awaiting_file':
+        return
+
+    if update.message.document:
+        await update.message.reply_text("Данный вопрос был передан отделу разработок, в ближайшее время с вами свяжется специалист.")
+        context.user_data.clear()
+    else:
+        await update.message.reply_text("Пожалуйста, прикрепите файл.")
+
+async def handle_file_after_screenshot(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'awaiting_file_after_screenshot':
+        return
+
+    if update.message.document:
+        await update.message.reply_text("Данная ошибка была передана отделу разработок, в ближайшее время с вами свяжется специалист.")
+        context.user_data.clear()
+    else:
+        await update.message.reply_text("Пожалуйста, прикрепите файл.")
+
+async def ask_license_key_renga(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    await update.callback_query.answer()
+    await update.callback_query.edit_message_text("Введите лицензионный ключ, который у вас есть.")
+    context.user_data['stage'] = 'license_key_renga'
+
+async def handle_license_key_renga(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'license_key_renga':
+        return
+
+    context.user_data['license_key'] = update.message.text
+    await update.message.reply_text("Напишите версию Renga, в которой вы работаете.")
+    context.user_data['stage'] = 'renga_version'
+
+async def handle_renga_version(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'renga_version':
+        return
+
+    context.user_data['renga_version'] = update.message.text
+    await update.message.reply_text("Напишите номер сборки плагинов, которую вы использовали.")
+    context.user_data['stage'] = 'build_number_renga'
+
+#async def handle_build_number_renga(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+#    if 'stage' not in context.user_data or context.user_data['stage'] != 'build_number_renga':
+#        return
+#
+#    context.user_data['stage'] = 'screenshot_and_description'
+#    keyboard = [
+#        [InlineKeyboardButton("Хочу сообщить об ошибке", callback_data='renga_error_report')],
+#        [InlineKeyboardButton("Хочу задать вопрос касаемо работы плагина", callback_data='renga_question')]
+#    ]
+#    reply_markup = InlineKeyboardMarkup(keyboard)
+#    await update.message.reply_text("Выберите один из вариантов:", reply_markup=reply_markup)
 
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if 'stage' in context.user_data:
@@ -360,8 +481,17 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
             await handle_build_number(update, context)
         elif context.user_data['stage'] == 'screenshot_and_description':
             await handle_screenshot_and_description(update, context)
+        elif context.user_data['stage'] == 'screenshot_and_description_activation':
+            await handle_screenshot_and_description(update, context)
+        elif context.user_data['stage'] == 'question_description':
+            await handle_question_description(update, context)
+        elif context.user_data['stage'] == 'license_key_renga':
+            await handle_license_key_renga(update, context)
+        elif context.user_data['stage'] == 'renga_version':
+            await handle_renga_version(update, context)
+        elif context.user_data['stage'] == 'build_number_renga':
+            await handle_screenshot_and_description(update, context)  
 
-#async def menu_renga(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -372,6 +502,7 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     elif query.data == 'plugin_help':
         await plugin_help(update, context)
     elif query.data == 'error_report':
+        context.user_data['initial_choice'] = 'error_report'
         await error_report(update, context)
     elif query.data == 'menu_concept_plugin':
         await menu_concept_plugin(update, context)
@@ -397,16 +528,33 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await menu_boxes_plugin(update, context)
     elif query.data == 'menu_boxes_error':
         await menu_boxes_error(update, context)
+    elif query.data == 'menu_renga_plugin':
+        await menu_renga_plugin(update, context)
+    elif query.data == 'menu_renga_error':
+        await menu_renga_error(update, context)
     elif query.data == 'activation_help':
+        context.user_data['initial_choice'] = 'activation_help'
         await activation_help(update, context)
     elif query.data in ['installation_error', 'registration_error', 'activation_key_error']:
-        await choose_revit_version(update, context)
-    elif query.data in ['revit_2019', 'revit_2020', 'revit_2021', 'revit_2022', 'revit_2023', 'revit_2024', 'revit_2025']:
+        await choose_revit_version_help(update, context)
+    elif query.data in ['revit_2019_help', 'revit_2020_help', 'revit_2021_help', 'revit_2022_help', 'revit_2023_help', 'revit_2024_help', 'revit_2025_help']:
         await ask_license_key_and_build_number(update, context)
-    elif query.data == 'menu_renga':
-        await menu_renga(update, context)
-    elif query.data == 'back_to_start':
-        await back_to_start(update, context)
+    elif query.data in ['no_file', 'send_file']:
+        await handle_file_decision(update, context)
+    elif query.data in ['concept_insolation', 'concept_keo', 'concept_parks', 'concept_trees', 'concept_model', 'concept_3d', 'concept_tep', 'concept_areas',
+                         'architect_room', 'architect_baseboard', 'architect_finishing', 'architect_copy', 'architect_openings', 'architect_floors', 'architect_areas',
+                         'architect_planning', 'architect_round', 'architect_apartment', 'constructive_assembly', 'constructive_sections', 'constructive_plans',
+                         'constructive_contour', 'constructive_contour_redactor', 'constructive_squeezing', 'constructive_frames', 'constructive_frametypes',
+                         'ov_vk_couplings', 'ov_vk_aero', 'ov_vk_systemtypes', 'ov_vk_systems', 'ov_vk_elevations', 'ov_vk_wall_thickness', 'ov_vk_isolation', 'ov_vk_S_isolation',
+                         'general_floors', 'general_nodes', 'general_print', 'general_multiplie_print', 'general_copy_spec', 'general_copy_params', 'general_params',
+                         'general_copy_params_armature', 'general_doors', 'general_firebox', 'general_intersection', 'general_node_manager', 'general_model_check',
+                         'boxes_tasks', 'boxes_merge', 'boxes_offset', 'boxes_cut', 'boxes_numbering', 'boxes_mark', 'boxes_holes', 'boxes_intersection_check',
+                         'boxes_overlapping_tasks_check', 'boxes_tasks_status', 'boxes_status_observer', 'boxes_tasks_check']:
+        await choose_revit_version_help(update, context)
+    elif query.data in ['renga_area', 'renga_activation']:
+        await ask_license_key_renga(update, context)
+    elif query.data in ['renga_error_report', 'renga_question']:
+        await handle_screenshot_and_description(update, context)
 
 def main() -> None:
     application = Application.builder().token(TOKEN).build()
@@ -415,6 +563,8 @@ def main() -> None:
     application.add_handler(CallbackQueryHandler(button))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, text_handler))
     application.add_handler(MessageHandler(filters.PHOTO, handle_screenshot_and_description))
+    application.add_handler(MessageHandler(filters.Document.ALL, handle_file))
+    application.add_handler(MessageHandler(filters.Document.ALL, handle_file_after_screenshot))
 
     application.run_polling()
 
