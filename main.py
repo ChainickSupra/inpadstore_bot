@@ -1,24 +1,55 @@
 from token1 import token
+from token1 import key
 from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, CallbackQueryHandler, ContextTypes
+from plugin_links import plugin_links
+import openai
 
 TOKEN = token
 
+
+client = openai.Client(
+    api_key=key,
+    base_url="https://api.proxyapi.ru/openai/v1",
+)
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("Помощь", callback_data='menu_help')]
+        [InlineKeyboardButton("Помощь", callback_data='menu_help')],
+        [InlineKeyboardButton("Поддержка", callback_data='menu_support')],
+        [InlineKeyboardButton("Часто задаваемые вопросы", callback_data='faq')],
+        [InlineKeyboardButton("Оформление лицензии", callback_data='license_info')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Выберите категорию", reply_markup=reply_markup)
 
 async def back_to_start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
-        [InlineKeyboardButton("Помощь", callback_data='menu_help')]
+        [InlineKeyboardButton("Помощь", callback_data='menu_help')],
+        [InlineKeyboardButton("Поддержка", callback_data='menu_support')],
+        [InlineKeyboardButton("Часто задаваемые вопросы", callback_data='faq')]
     ]
     reply_markup = InlineKeyboardMarkup(keyboard)
     query = update.callback_query
     await query.answer()
-    await query.edit_message_text("Выберите категорию", reply_markup=reply_markup)
+    await query.edit_message_text(text="Выберите категорию", reply_markup=reply_markup)
+    await start(update, context)
+
+async def menu_support(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    keyboard = [
+        [InlineKeyboardButton("Концепция", callback_data='category_concept')],
+        [InlineKeyboardButton("Архитектура", callback_data='category_architecture')],
+        [InlineKeyboardButton("Конструктив", callback_data='category_constructive')],
+        [InlineKeyboardButton("ОВ и ВК", callback_data='category_engineering')],
+        [InlineKeyboardButton("Боксы и отверстия", callback_data='category_boxes')],
+        [InlineKeyboardButton("Общие", callback_data='category_general')],
+        [InlineKeyboardButton("Renga", callback_data='category_renga')],
+        [InlineKeyboardButton("Назад", callback_data='back_to_start')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("Выберите категорию, в которой находится плагин", reply_markup=reply_markup)
 
 async def menu_help(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     keyboard = [
@@ -303,7 +334,7 @@ async def menu_boxes_error(update: Update, context: ContextTypes.DEFAULT_TYPE) -
     await query.edit_message_text("Выберите каким плагином вы воспользовались:", reply_markup=reply_markup)
 
 async def menu_renga_plugin(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    keyboard = [   
+    keyboard = [
         [InlineKeyboardButton("Подсчет площадей", callback_data='renga_area')],
         [InlineKeyboardButton("Активация", callback_data='renga_activation')],
         [InlineKeyboardButton("Назад", callback_data='plugin_help')]
@@ -461,6 +492,177 @@ async def handle_renga_version(update: Update, context: ContextTypes.DEFAULT_TYP
     await update.message.reply_text("Напишите номер сборки плагинов, которую вы использовали.")
     context.user_data['stage'] = 'build_number_renga'
 
+async def handle_category_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+
+    categories = {
+        'category_concept': [
+            "Инсоляция", "КЕО", "Генерация парков", "Генерация деревьев", "Разлиновка модели", "3D сетки", "БыстроТЭПы", "Подсчет площадей"
+        ],
+        'category_architecture': [
+            "Определить помещение", "Расчет плинтуса", "Отделка", "Копировать отделку", "Проемы по дверям/окнам из связи", "Соединение полов", "Подсчет площадей", "Планировка", "Округление площади", "Нумерация квартир"
+        ],
+        'category_constructive': [
+            "Сборка арматуры", "Создать разрезы и сечения", "Создание планов", "Создание контура", "Редактирование контура", "Расчет продавливания", "Создание каркасов", "Создание видов каркасов"
+        ],
+        'category_engineering': [
+            "Муфты/гильзы", "Аэродинамика", "Создать виды систем", "Спецификации систем", "Высотные отметки", "Толщина стенки", "Диаметр изоляции", "S изоляции"
+        ],
+        'category_general': [
+            "Этажи и секции", "Подсчет узлов", "Печать листов", "Множественная печать", "Копировать спецификацию", "Копировать параметры", "Параметры семейств", "Копировать параметры арматуры", "Комбинатор дверей", "Огнекороб", "Просмотр пересечения", "Менеджер узлов", "Проверка модели"
+        ],
+        'category_boxes': [
+            "Создание заданий", "Объединение", "Смещение", "Обрезать", "Нумерация", "Отметка", "Отверстия", "Проверка пересечений", "Проверка пересекающихся заданий", "Статусы заданий", "Обозреватель статусов", "Проверка заданий"
+        ],
+        'category_renga': ["Подсчет площадей"]
+    }
+
+    selected_category = query.data
+    plugins = categories.get(selected_category, [])
+
+    if plugins:
+        keyboard = [[InlineKeyboardButton(plugin, callback_data=f'splugin_{plugin}')] for plugin in plugins]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await query.edit_message_text(f"Выберите на какой плагин вам нужна информация", reply_markup=reply_markup)
+
+    context.user_data['stage'] = 'plugin_selection'
+
+async def handle_plugin_selection(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+
+    selected_plugin = query.data.replace('splugin_', '')
+    links = plugin_links.get(selected_plugin, "Ссылки для данного плагина еще не добавлены.")
+
+    await query.edit_message_text(f"Ссылки для плагина {selected_plugin}:\n{links}", parse_mode='Markdown')
+
+async def faq(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    keyboard = [
+        [InlineKeyboardButton("Назад", callback_data='back_to_start')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await query.edit_message_text("Пожалуйста, напишите ваш вопрос:", reply_markup=reply_markup)
+    context.user_data['stage'] = 'faq_question'
+    context.user_data['conversation'] = []
+
+async def handle_faq_question(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'faq_question':
+        return
+
+    user_question = update.message.text
+    context.user_data['conversation'].append({"role": "user", "content": user_question})
+    response = client.chat.completions.create(
+        model="gpt-3.5-turbo",
+        messages=context.user_data['conversation'],
+        max_tokens=500
+    )
+    answer = response.choices[0].message.content.strip()
+    context.user_data['conversation'].append({"role": "assistant", "content": answer})
+
+    chunks = [answer[i:i + 4096] for i in range(0, len(answer), 4096)]
+    for chunk in chunks:
+        keyboard = [
+            [InlineKeyboardButton("Назад", callback_data='back_to_start')]
+        ]
+        reply_markup = InlineKeyboardMarkup(keyboard)
+        await update.message.reply_text(chunk, reply_markup=reply_markup)    
+
+async def license_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    keyboard = [
+        [InlineKeyboardButton("Купить плагины", callback_data='buy_plugins')],
+        [InlineKeyboardButton("Протестировать плагины", callback_data='test_plugins')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await query.edit_message_text("Выберите одну из кнопок", reply_markup=reply_markup)
+
+async def buy_plugins(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("Укажите, пожалуйста, информацию о себе:\n"
+                                  "Укажите ваше ФИО\n"
+                                  "Вы Юр.Лицо или Физ.Лицо\n"
+                                  "Укажите название вашей компании\n"
+                                  "Укажите город, в котором вы находитесь\n"
+                                  "Укажите вашу почту и номер телефона\n"
+                                  "---Данная информация поможет нам с вами связаться---")
+    context.user_data['stage'] = 'waiting_for_user_info'
+
+async def test_plugins(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("Укажите, пожалуйста, информацию о себе:\n"
+                                  "Укажите ваше ФИО\n"
+                                  "Вы Юр.Лицо или Физ.Лицо\n"
+                                  "Укажите название вашей компании\n"
+                                  "Укажите город, в котором вы находитесь\n"
+                                  "Укажите вашу почту и номер телефона\n"
+                                  "---Данная информация поможет нам с вами связаться---")
+    context.user_data['stage'] = 'waiting_for_user_info_test'
+
+async def handle_user_info_test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'waiting_for_user_info_test':
+        return
+
+    context.user_data['user_info'] = update.message.text
+    await update.message.reply_text("Напишите плагины, которые вы хотите протестировать.")
+    context.user_data['stage'] = 'waiting_for_plugins_test'    
+
+async def handle_plugins_test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'waiting_for_plugins_test':
+        return
+
+    context.user_data['plugins'] = update.message.text
+    await update.message.reply_text("Укажите количество лицензий, которые вы хотите получить.")
+    context.user_data['stage'] = 'waiting_for_licenses_test'
+
+async def handle_licenses_test(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'waiting_for_licenses_test':
+        return
+
+    context.user_data['licenses'] = update.message.text
+    await update.message.reply_text("Ваша информация была передана менеджеру.")
+    context.user_data.clear()
+
+async def handle_user_info(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'waiting_for_user_info':
+        return
+
+    context.user_data['user_info'] = update.message.text
+    await update.message.reply_text("Напишите плагины, которые вы хотите приобрести.")
+    context.user_data['stage'] = 'waiting_for_plugins'
+
+async def handle_plugins(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'waiting_for_plugins':
+        return
+
+    context.user_data['plugins'] = update.message.text
+    keyboard = [
+        [InlineKeyboardButton("Да", callback_data='yes_demo')],
+        [InlineKeyboardButton("Нет", callback_data='no_demo')]
+    ]
+    reply_markup = InlineKeyboardMarkup(keyboard)
+    await update.message.reply_text("Нужна ли вам демонстрация плагина?", reply_markup=reply_markup)
+    context.user_data['stage'] = 'waiting_for_demo'
+
+async def handle_demo(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    query = update.callback_query
+    await query.answer()
+    await query.edit_message_text("Укажите количество лицензий, которые вы хотите приобрести.")
+    context.user_data['stage'] = 'waiting_for_licenses'
+
+async def handle_licenses(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+    if 'stage' not in context.user_data or context.user_data['stage'] != 'waiting_for_licenses':
+        return
+
+    context.user_data['licenses'] = update.message.text
+    await update.message.reply_text("Ваша информация была передана менеджеру.")
+    context.user_data.clear()
+
 async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     if 'stage' in context.user_data:
         if context.user_data['stage'] == 'license_key':
@@ -478,8 +680,23 @@ async def text_handler(update: Update, context: ContextTypes.DEFAULT_TYPE) -> No
         elif context.user_data['stage'] == 'renga_version':
             await handle_renga_version(update, context)
         elif context.user_data['stage'] == 'build_number_renga':
-            await handle_screenshot_and_description(update, context)  
-
+            await handle_screenshot_and_description(update, context)
+        elif context.user_data['stage'] == 'plugin_selection':
+            await handle_plugin_selection(update, context)
+        elif context.user_data['stage'] == 'faq_question':
+            await handle_faq_question(update, context)
+        elif context.user_data['stage'] == 'waiting_for_user_info':
+            await handle_user_info(update, context)
+        elif context.user_data['stage'] == 'waiting_for_plugins':
+            await handle_plugins(update, context)
+        elif context.user_data['stage'] == 'waiting_for_licenses':
+            await handle_licenses(update, context)
+        elif context.user_data['stage'] == 'waiting_for_user_info_test':
+            await handle_user_info_test(update, context)
+        elif context.user_data['stage'] == 'waiting_for_plugins_test':
+            await handle_plugins_test(update, context)
+        elif context.user_data['stage'] == 'waiting_for_licenses_test':
+            await handle_licenses_test(update, context)
 
 async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     query = update.callback_query
@@ -543,6 +760,24 @@ async def button(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await ask_license_key_renga(update, context)
     elif query.data in ['renga_error_report', 'renga_question']:
         await handle_screenshot_and_description(update, context)
+    elif query.data == 'menu_support':
+        await menu_support(update, context)
+    elif query.data in ['category_concept', 'category_architecture', 'category_constructive', 'category_engineering', 'category_boxes', 'category_general', 'category_renga']:
+        await handle_category_selection(update, context)
+    elif query.data.startswith('splugin_'):
+        await handle_plugin_selection(update, context)
+    elif query.data == 'faq':
+        await faq(update, context)
+    elif query.data == 'back_to_start':
+        await back_to_start(update, context)
+    elif query.data == 'license_info':
+        await license_info(update, context)
+    elif query.data == 'buy_plugins':
+        await buy_plugins(update, context)
+    elif query.data == 'test_plugins':
+        await test_plugins(update, context)
+    elif query.data in ['yes_demo', 'no_demo']:
+        await handle_demo(update, context)
 
 def main() -> None:
     application = Application.builder().token(TOKEN).build()
@@ -553,6 +788,9 @@ def main() -> None:
     application.add_handler(MessageHandler(filters.PHOTO, handle_screenshot_and_description))
     application.add_handler(MessageHandler(filters.Document.ALL, handle_file))
     application.add_handler(MessageHandler(filters.Document.ALL, handle_file_after_screenshot))
+    application.add_handler(CommandHandler("support", menu_support))
+    application.add_handler(CallbackQueryHandler(handle_category_selection, pattern=r'^category_'))
+    application.add_handler(CallbackQueryHandler(handle_plugin_selection, pattern=r'^splugin_'))
 
     application.run_polling()
 
